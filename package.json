@@ -1,5 +1,4 @@
 {
-  "private": true,
   "displayName": "Litter Robot 4",
   "name": "homebridge-litter-robot-4",
   "version": "1.0.0",
