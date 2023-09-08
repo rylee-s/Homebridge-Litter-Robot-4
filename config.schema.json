@@ -1,0 +1,28 @@
+{
+  "pluginAlias": "LitterRobot4",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "email": {
+        "title": "Litter Robot App Email",
+        "type": "string",
+        "required": true,
+        "default": "my_email"
+      },
+      "password": {
+        "title": "Litter Robot App Password",
+        "type": "string",
+        "required": true,
+        "default": "my_password"
+      },
+      "debugMode": {  
+        "title": "Debug Mode",
+        "type": "boolean",
+        "required": false,
+        "default": false
+      }
+    }
+  }
+}
