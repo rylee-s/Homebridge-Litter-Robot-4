@@ -5,8 +5,9 @@ import {
   API,
 } from 'homebridge';
 
-import axios from 'axios';
+import axios, { AxiosPromise } from 'axios';
 import { parseJwt } from '../utils';
+import { whiskerResponse } from './Whisker.types';
 
 export default class Whisker {
   public accountId?: string;
@@ -127,7 +128,7 @@ export default class Whisker {
 
   }
 
-  public async sendCommand(command: string): Promise<any> {
+  public async sendCommand(command: string): AxiosPromise<whiskerResponse> {
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -139,9 +140,6 @@ export default class Whisker {
       data: command,
     };
 
-    return axios.request(config)
-      .catch((e) => {
-        this.log.error(e);
-      });
+    return axios.request<whiskerResponse>(config);
   }
 }

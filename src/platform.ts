@@ -3,6 +3,7 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import Whisker from './api/Whisker';
 import { LitterRobot } from './litterRobot';
 import { PLUGIN_NAME, PLATFORM_NAME } from './settings';
+import { Robot } from './api/Whisker.types';
 
 /**
  * HomebridgePlatform
@@ -110,7 +111,7 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
     account.sendCommand(command).then((response) => {
       const data = response.data.data.query;
 
-      data.forEach((device: any) => {
+      data.forEach((device: Robot) => {
         const litterRobot = this.litterRobots.find((bot) => bot.serialNumber === device.serial);
         if (litterRobot) {
           litterRobot.update(device);

@@ -3,6 +3,7 @@ import Whisker from './api/Whisker';
 import { Logger } from 'homebridge';
 import { GlobeLightAccessory } from './accessories/globeLight';
 import { OccupancySensorAccessory } from './accessories/occupancySensor';
+import { Robot } from './api/Whisker.types';
 
 export class LitterRobot {
   private globeLight: GlobeLightAccessory;
@@ -19,7 +20,7 @@ export class LitterRobot {
 
   constructor(
     private readonly account: Whisker,
-    public readonly device: any,
+    public readonly device: Robot,
     private readonly platform: LitterRobotPlatform,
     private readonly log: Logger,
   ) {
@@ -28,7 +29,7 @@ export class LitterRobot {
     this.occupancySensor = new OccupancySensorAccessory(this.platform, this.account, this);
   }
 
-  public update(device: any): void {
+  public update(device: Robot): void {
     this.globeLight?.update(device.isNightLightLEDOn);
     this.occupancySensor?.update(device.robotStatus);
   }
