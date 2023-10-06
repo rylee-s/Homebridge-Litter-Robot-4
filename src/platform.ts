@@ -1,8 +1,8 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
 
-import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import Whisker from './api/Whisker';
-import { GlobeLightAccessory } from './accessories/globeLight';
+import { LitterRobot } from './litterRobot';
+import { PLUGIN_NAME, PLATFORM_NAME } from './settings';
 
 /**
  * HomebridgePlatform
@@ -15,7 +15,7 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
-
+  public litterRobots: LitterRobot[] = [];
   constructor(
     public readonly log: Logger,
     public readonly config: PlatformConfig,
@@ -36,8 +36,22 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
       account.authenticate().then(() => {
         this.log.debug('Authenticated now discovering devices');
         this.discoverDevices(account);
+        this.pollForUpdates(account, 10000);
       });
     });
+  }
+
+  getOrCreateAccessory(uuid: string, name: string) {
+    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+    if (existingAccessory) {
+      this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+      return existingAccessory;
+    } else {
+      this.log.info('Adding new accessory:', name);
+      const accessory = new this.api.platformAccessory(name, uuid);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      return accessory;
+    }
   }
 
   /**
@@ -72,43 +86,41 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
       let devices = response.data.data.query;
       devices ||= [];
 
-      // loop over the discovered devices and register each one if it has not already been registered
+      // loop over the discovered devices and register each one
       for (const device of devices) {
-        // generate a unique id for the accessory
-        const uuid = this.api.hap.uuid.generate(device.serial);
-
-        // see if an accessory with the same uuid has already been registered and restored from
-        // the cached devices we stored in the `configureAccessory` method above
-        const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
-
-        if (existingAccessory) {
-          // the accessory already exists
-          this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
-          new GlobeLightAccessory(this, existingAccessory, account, device.serial);
-
-          // it is possible to remove platform accessories at any time using `api.unregisterPlatformAccessories`, eg.:
-          // remove platform accessories when no longer present
-          // this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-          // this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
-        } else {
-          // the accessory does not yet exist, so we need to create it
-          this.log.info('Adding new accessory:', device.name);
-
-          // create a new accessory
-          const accessory = new this.api.platformAccessory(device.name, uuid);
-
-          // store a copy of the device object in the `accessory.context`
-          // the `context` property can be used to store any data about the accessory you may need
-          accessory.context.device = device;
-
-          // create the accessory handler for the newly create accessory
-          // this is imported from `platformAccessory.ts`
-          new GlobeLightAccessory(this, accessory, account, device.serial);
-
-          // link the accessory to your platform
-          this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-        }
+        this.log.debug('Discovered device:', device.name, device.serial);
+        this.litterRobots.push(new LitterRobot(account, device, this, this.log));
       }
     });
   }
+
+  // Poll for updates
+  pollForUpdates(account: Whisker, interval: number) {
+    const command = JSON.stringify({
+      query: `{
+        query: getLitterRobot4ByUser(userId: "${account.accountId}") {
+            serial
+            name
+            isNightLightLEDOn
+            robotStatus
+            catDetect
+        }
+    }`,
+    });
+    account.sendCommand(command).then((response) => {
+      const data = response.data.data.query;
+
+      data.forEach((device: any) => {
+        const litterRobot = this.litterRobots.find((bot) => bot.serialNumber === device.serial);
+        if (litterRobot) {
+          litterRobot.update(device);
+        }
+      });
+
+      setTimeout(() => {
+        this.pollForUpdates(account, interval);
+      }, interval);
+    });
+  }
 }
+
