@@ -10,6 +10,7 @@
 
 # Current Feature List
 - Globe Light Toggle
+- Cat Detection
 - .. Thats it
 
 # Road Map 🚗
