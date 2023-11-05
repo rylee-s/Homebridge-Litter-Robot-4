@@ -1,19 +1,51 @@
-<p align="center">
-
-<img src="https://github.com/homebridge/branding/raw/master/logos/homebridge-wordmark-logo-vertical.png" width="150">
-
-</p>
-
 # Litter Robot 4 Homebridge Plugin
 
-### ⚠️ This Pacakage is under active developemnt and is currently missing major features ⚠️
+## Features
+- Supports Multiple Litter Robot 4 Devices
+- Toggle The Globle Light
+- Cat Detect Sensor Support
 
-# Current Feature List
-- Globe Light Toggle
-- Cat Detection
-- .. Thats it
 
-# Road Map 🚗
+## Supported Robot Versions
+- Litter Robot 4
 
-# Development setup
+## Installation
 
+#### For Homebridge Web UI Users
+Go to plugin page, search for `@rylee-s/Homebridge-Litter-Robot-4` and install it.
+
+#### For Homebridge Command Line Users
+
+Run the following command in the terminal:
+```
+npm install @rylee-s/Homebridge-Litter-Robot-4
+```
+
+
+## Configuration
+
+Configuration should be very simple!
+
+### Homebridge Web UI 
+Just enter the Username and Password you use for your Whisker App
+
+### Homebridge Command Line Users
+
+```json
+{
+            "platform": "LitterRobot4",
+            "email": "whisker.app@email.com",
+            "password": "WhiskerAppPassword"
+}
+```
+
+## Limitations
+
+## FAQ
+
+
+## Contributing
+PRs and issues are welcome.
+
+# 
+Thanks for taking a look at my project! If it helps you, please give it a star ⭐️
