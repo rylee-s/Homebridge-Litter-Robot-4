@@ -37,7 +37,7 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
       account.authenticate().then(() => {
         this.log.debug('Authenticated now discovering devices');
         this.discoverDevices(account);
-        this.pollForUpdates(account, 10000);
+        this.pollForUpdates(account, 100000);
       });
     });
   }
