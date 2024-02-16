@@ -105,6 +105,7 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
             isNightLightLEDOn
             robotStatus
             catDetect
+            DFILevelPercent
         }
     }`,
     });

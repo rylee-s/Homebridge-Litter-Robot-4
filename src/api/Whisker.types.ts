@@ -12,4 +12,5 @@ export interface Robot {
   isNightLightLEDOn: boolean;
   robotStatus: string;
   catDetect: string;
+  DFILevelPercent: number;
 }
