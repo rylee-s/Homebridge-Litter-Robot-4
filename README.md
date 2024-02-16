@@ -1,9 +1,10 @@
 # Litter Robot 4 Homebridge Plugin
 
 ## Features
-- Supports Multiple Litter Robot 4 Devices
-- Toggle The Globle Light
-- Cat Detect Sensor Support
+- Supports Multiple Litter Robot 4 Devices 🤖🤖🤖🤖🤖🤖🤖
+- Toggle The Globle Light 💡
+- Cat Detect Sensor 📸
+- Waste Drawer Level Sensor 💰
 
 
 ## Supported Robot Versions
