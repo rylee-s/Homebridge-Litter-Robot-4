@@ -13,26 +13,31 @@ export class DrawerLevelAccessory {
     Level: 0,
   };
 
-
   constructor(
     private readonly platform: LitterRobotPlatform,
     private readonly account: Whisker,
     private readonly LitterRobot: LitterRobot,
   ) {
-      this.log = this.platform.log;
-      this.name = this.LitterRobot.name + ' Drawer Level';
-      this.uuid = this.LitterRobot.uuid.drawerLevel;
-      this.accessory = this.platform.getOrCreateAccessory(this.uuid, this.name);
+    this.log = this.platform.log;
+    this.name = this.LitterRobot.name + ' Drawer Level';
+    this.uuid = this.LitterRobot.uuid.drawerLevel;
+    this.accessory = this.platform.getOrCreateAccessory(this.uuid, this.name);
 
-      // create a new HumiditySensor service
-      this.service = this.accessory.getService(this.platform.Service.HumiditySensor) ||
+    // Check if the drawer sensor is disabled in the config
+    if (this.platform.config.disableDrawerSensor) {
+      this.log.info('Drawer level sensor disabled by configuration');
+      return;
+    }
+
+    // Create a new HumiditySensor service
+    this.service =
+      this.accessory.getService(this.platform.Service.HumiditySensor) ||
       this.accessory.addService(this.platform.Service.HumiditySensor);
-    
 
-      // create handlers for required characteristics
-      this.service.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
-        .onGet(this.handleCurrentRelativeHumidityGet.bind(this));
-
+    // Create handlers for required characteristics
+    this.service
+      .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+      .onGet(this.handleCurrentRelativeHumidityGet.bind(this));
   }
 
   /**
@@ -40,17 +45,27 @@ export class DrawerLevelAccessory {
    */
   handleCurrentRelativeHumidityGet() {
     this.log.debug('Triggered GET CurrentRelativeHumidity');
-    return this.state.Level;;
+    return this.state.Level;
   }
 
-    // update the state of the HumiditySensor on the platform
-    update(level: number) {
-      // correct for the fact that the litter robot reports 110% when full
-      level = Math.round(level / 110 * 100);
-      if (this.state.Level !== level) {
-        this.platform.log.debug(`Updating ${this.name} -> `, level);
-        this.state.Level = level;
-        this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, level);
-      }
+  /**
+   * Update the state of the HumiditySensor on the platform
+   */
+  update(level: number) {
+    if (this.platform.config.disableDrawerSensor) {
+      this.log.debug(`Drawer level sensor update skipped as it is disabled.`);
+      return;
     }
+
+    // Correct for the fact that the litter robot reports 110% when full
+    level = Math.round((level / 110) * 100);
+    if (this.state.Level !== level) {
+      this.platform.log.debug(`Updating ${this.name} -> `, level);
+      this.state.Level = level;
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.CurrentRelativeHumidity,
+        level,
+      );
+    }
+  }
 }

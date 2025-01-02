@@ -22,6 +22,13 @@
         "type": "boolean",
         "required": false,
         "default": false
+      },
+      "disableDrawerSensor": {
+        "type": "boolean",
+        "title": "Disable Drawer Level Sensor",
+        "description": "Disables monitoring of the drawer level sensor.",
+        "default": false,
+        "required": false
       }
     }
   }
