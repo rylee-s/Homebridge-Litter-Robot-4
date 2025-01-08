@@ -45,7 +45,14 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
   getOrCreateAccessory(uuid: string, name: string) {
     const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
     if (existingAccessory) {
-      this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+      const skipDrawerLevel = this.config.disableDrawerSensor;
+      const isDrawerLevel = existingAccessory.services[1].constructor.name === 'HumiditySensor';
+      if (skipDrawerLevel && isDrawerLevel) {
+        this.log.info('Skipping DrawerLevel:', name);
+        this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+        return existingAccessory;
+      }
+      this.log.info('Restoring existing accessory:', name);
       return existingAccessory;
     } else {
       this.log.info('Adding new accessory:', name);
@@ -90,7 +97,7 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
       // loop over the discovered devices and register each one
       for (const device of devices) {
         this.log.debug('Discovered device:', device.name, device.serial);
-        this.litterRobots.push(new LitterRobot(account, device, this, this.log));
+        this.litterRobots.push(new LitterRobot(account, device, this, this.log, this.config));
       }
     });
   }
