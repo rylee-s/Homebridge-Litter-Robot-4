@@ -36,7 +36,8 @@ Just enter the Username and Password you use for your Whisker App
 {
             "platform": "LitterRobot4",
             "email": "whisker.app@email.com",
-            "password": "WhiskerAppPassword"
+            "password": "WhiskerAppPassword",
+            "disableDrawerSensor": false
 }
 ```
 

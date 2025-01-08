@@ -1,7 +1,7 @@
 {
   "displayName": "Litter Robot 4",
   "name": "homebridge-litter-robot-4",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Litter Robot 4 Plugin for Apple HomeKit via Homebridge",
   "license": "Apache-2.0",
   "repository": {
