@@ -119,7 +119,7 @@ export class LitterRobotPlatform implements DynamicPlatformPlugin {
     account.sendCommand(command).then((response) => {
       const data = response.data.data.query;
 
-      data.forEach((device: Robot) => {
+      data?.forEach((device: Robot) => {
         const litterRobot = this.litterRobots.find((bot) => bot.serialNumber === device.serial);
         if (litterRobot) {
           litterRobot.update(device);
